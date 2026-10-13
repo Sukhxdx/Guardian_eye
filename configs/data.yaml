@@ -1,0 +1,110 @@
+seed: 27
+
+# Paths are relative to the repository root.
+sample_root: data/sample
+raw_root: data/raw
+processed_root: data/processed
+
+# When a real raw dataset directory is missing or empty, preparation still
+# processes the generated sample tree so the pipeline can be tested.
+use_sample_if_raw_missing: true
+
+image:
+  classes: [human, vehicle, animal, empty]
+  box_classes: [human, vehicle, animal]
+  domains: [aerial_thermal, camera_trap_rgb]
+  # replicate: copy the thermal channel to RGB
+  # pseudocolor: percentile-normalized iron-style map
+  thermal_representation: replicate
+  val_ratio: 0.15
+  test_ratio: 0.15
+  sources:
+    birdsai:
+      enabled: true
+      domain: aerial_thermal
+      path: data/raw/birdsai
+    cct:
+      enabled: true
+      domain: camera_trap_rgb
+      path: data/raw/cct
+    serengeti:
+      enabled: true
+      domain: camera_trap_rgb
+      path: data/raw/serengeti
+  # Source label -> GuardianEye class. Unknown labels are skipped and logged.
+  # "empty" / blank rows are negative images (no boxes).
+  label_map:
+    human: human
+    person: human
+    pedestrian: human
+    vehicle: vehicle
+    car: vehicle
+    truck: vehicle
+    animal: animal
+    elephant: animal
+    zebra: animal
+    giraffe: animal
+    wildebeest: animal
+    gazelle: animal
+    buffalo: animal
+    lion: animal
+    bird: animal
+    empty: empty
+    blank: empty
+    negative: empty
+
+audio:
+  sample_rate: 16000
+  window_seconds: 3.0
+  hop_seconds: 3.0
+  n_mels: 64
+  n_fft: 1024
+  hop_length: 256
+  fmin: 50
+  fmax: 8000
+  sites: [belize, vietnam]
+  val_ratio: 0.15
+  test_ratio: 0.15
+  sources:
+    belize:
+      enabled: true
+      site: belize
+      path: data/raw/audio/belize
+    vietnam:
+      enabled: true
+      site: vietnam
+      path: data/raw/audio/vietnam
+
+# Download URLs are intentionally blank. Fill these in locally.
+# A value of TODO means "do not download".
+downloads:
+  birdsai:
+    url: "TODO"
+    sha256: ""
+    dest: data/raw/birdsai
+    notes: "BIRDSAI aerial thermal frames. Primary image source."
+  cct:
+    url: "TODO"
+    sha256: ""
+    dest: data/raw/cct
+    notes: "Caltech Camera Traps, including empty frames."
+  serengeti:
+    url: "TODO"
+    sha256: ""
+    dest: data/raw/serengeti
+    notes: "Snapshot Serengeti. Supporting camera-trap source."
+  belize_gunshot:
+    url: "TODO"
+    sha256: ""
+    dest: data/raw/audio/belize
+    notes: "Tropical Forest Gunshot dataset (Katsis et al.), Belize. Primary audio source."
+  vietnam_gunshot:
+    url: "TODO"
+    sha256: ""
+    dest: data/raw/audio/vietnam
+    notes: "Chu Mom Ray gunshot set. WAV and/or spectrogram images. Cross-site test source."
+
+paired:
+  # Synthetic proxy protocol. Not field-aligned incidents.
+  output: data/processed/paired/events.jsonl
+  time_window_s: 5.0

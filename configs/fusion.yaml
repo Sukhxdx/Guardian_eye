@@ -1,0 +1,41 @@
+seed: 27
+
+# Rules mode is the primary late-fusion policy.
+# weighted mode maps the weighted score onto HIGH / MEDIUM / LOW.
+decision_mode: rules
+
+# Inclusive thresholds. A score equal to the threshold counts as strong.
+image_positive_threshold: 0.50
+audio_positive_threshold: 0.50
+
+# Used when only one reliable modality is present. Stricter so a single
+# sensor cannot open a HIGH alert.
+unimodal_image_threshold: 0.85
+unimodal_audio_threshold: 0.85
+
+# A visual indicator and a gunshot count as coincident when the detection
+# timestamp falls inside the audio window expanded by this many seconds.
+time_window_s: 5.0
+
+# Animal detections are recorded but are not poaching indicators.
+visual_indicator_classes: [human, vehicle]
+
+weights:
+  balanced:
+    image: 0.5
+    audio: 0.5
+  night:
+    image: 0.3
+    audio: 0.7
+  wind:
+    image: 0.7
+    audio: 0.3
+default_profile: balanced
+
+weighted_high_threshold: 0.75
+weighted_medium_threshold: 0.45
+
+# Rangers are alerted only at HIGH unless this list is edited.
+alert_levels: [HIGH]
+
+protocol_note: "synthetic proxy protocol — not field validation"

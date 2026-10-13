@@ -1,0 +1,27 @@
+host: 0.0.0.0
+port: 8742
+db_path: data/events.sqlite
+snapshot_dir: data/events/snapshots
+audio_dir: data/events/audio
+
+data_config: configs/data.yaml
+image_config: configs/image.yaml
+audio_config: configs/audio.yaml
+fusion_config: configs/fusion.yaml
+
+image_weights_dir: models/image
+audio_weights: models/audio/best.pt
+calibration_dir: models/calibration
+default_domain: camera_trap_rgb
+
+# Optional. Overridden by the HF_MODEL_REPO environment variable.
+hf_model_repo: ""
+hf_local_dir: models/hf
+
+device: cpu
+video_sample_fps: 2.0
+latency_target_s: 5.0
+
+# Inference confidence floor passed to YOLO. Fusion applies its own thresholds.
+yolo_conf: 0.15
+yolo_imgsz: 640

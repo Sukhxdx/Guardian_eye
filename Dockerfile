@@ -1,0 +1,41 @@
+FROM python:3.11-slim-bookworm
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    GUARDIANEYE_HOST=0.0.0.0 \
+    GUARDIANEYE_PORT=8742
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libsndfile1 ffmpeg libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY requirements.txt pyproject.toml README.md ./
+COPY src ./src
+COPY configs ./configs
+COPY scripts ./scripts
+COPY deploy ./deploy
+
+RUN pip install --upgrade pip \
+    && pip install -r requirements.txt \
+    && pip install --no-deps -e .
+
+RUN useradd --create-home --uid 10001 appuser \
+    && mkdir -p /app/data /app/models /app/reports \
+    && chown -R appuser:appuser /app
+
+USER appuser
+
+RUN python scripts/generate_sample_data.py \
+    && python scripts/prepare_image_data.py --config configs/data.yaml \
+    && python scripts/prepare_audio_data.py --config configs/data.yaml \
+    && python scripts/build_paired_events.py --config configs/data.yaml
+
+EXPOSE 8742
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8742/health')" || exit 1
+
+CMD ["python", "-m", "guardianeye.serve.api"]

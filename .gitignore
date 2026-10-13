@@ -1,0 +1,43 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+.env
+*.sqlite
+*.sqlite3
+
+# Datasets and generated media stay local.
+data/raw/
+data/processed/
+data/sample/
+data/events/
+data/*.sqlite
+
+# Model weights and training runs.
+models/**
+!models/.gitkeep
+*.pt
+*.pth
+*.onnx
+runs/
+wandb/
+
+# Generated evaluation artifacts. The template is tracked.
+reports/eda/
+reports/image/
+reports/audio/
+reports/fusion/
+reports/latency.json
+reports/INDEX.md
+
+.DS_Store
+dist/
+build/
+*.log

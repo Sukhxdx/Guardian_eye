@@ -1,0 +1,61 @@
+seed: 27
+data_config: configs/data.yaml
+
+# small_cnn: trained from scratch on log-mel spectrograms.
+# panns: frozen embedding checkpoint + linear head. Requires audio.panns_checkpoint.
+backend: small_cnn
+panns_checkpoint: ""
+
+sample_rate: 16000
+window_seconds: 3.0
+hop_seconds: 1.0
+n_mels: 64
+n_fft: 1024
+hop_length: 256
+fmin: 50
+fmax: 8000
+
+epochs: 20
+batch_size: 16
+lr: 0.001
+weight_decay: 0.0001
+num_workers: 0
+device: cpu
+
+# Class-weighted cross-entropy. Background clips are kept; they are not dropped.
+balance: loss_weight
+decision_threshold: 0.5
+
+augment:
+  time_shift_max: 0.2
+  noise_std: 0.01
+  freq_mask: 8
+  time_mask: 16
+
+# Cross-site experiments plus in-domain controls. Validation is drawn from the
+# training site only. The other site is test-only.
+experiments:
+  - name: belize_to_vietnam
+    train_site: belize
+    test_site: vietnam
+  - name: vietnam_to_belize
+    train_site: vietnam
+    test_site: belize
+  - name: in_domain_belize
+    train_site: belize
+    test_site: belize
+    in_domain: true
+  - name: in_domain_vietnam
+    train_site: vietnam
+    test_site: vietnam
+    in_domain: true
+
+# Checkpoint loaded by the API when models/audio/best.pt is missing.
+serve_experiment: belize_to_vietnam
+output_dir: models/audio
+
+smoke:
+  epochs: 1
+  batch_size: 4
+  # Still runs every experiment so the cross-site script path is covered.
+  experiments: [belize_to_vietnam, vietnam_to_belize, in_domain_belize, in_domain_vietnam]

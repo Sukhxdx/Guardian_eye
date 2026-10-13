@@ -1,0 +1,16 @@
+---
+description: GuardianEye project rules for the multimodal poaching-indicator system
+alwaysApply: true
+---
+
+# GuardianEye
+
+Image and audio only. Video is sampled into frames for the image branch. There is no labelled poacher class and no time-aligned field incidents, so the system detects indicators and fuses them late. One detection is not proof of poaching.
+
+- Never write accuracy, mAP, F1, precision, recall, or false-positive rate numbers by hand. Evaluation scripts write them to `reports/`. If weights are missing, say so.
+- Split audio by site (Belize vs Vietnam, both directions, plus in-domain controls). Report image metrics separately for `aerial_thermal` and `camera_trap_rgb`.
+- Keep empty images and background audio. Do not downsample them away.
+- Use class-weighted loss or oversampling of rare classes. Report precision, recall, F1, and false-positive rate.
+- Fusion pairs are a synthetic proxy protocol. Label them that way.
+- Configuration lives in `configs/*.yaml`. Seed runs. Do not commit datasets or large weights.
+- Dataset URLs stay as TODO until a person fills them in. Do not invent URLs.
