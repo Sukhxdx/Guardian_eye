@@ -141,6 +141,10 @@ Everything tunable is in `configs/`:
 
 Seeds default to 27.
 
+## Multimodal AI coursework
+
+The Multimodal AI (MAI) written report is `docs/MAI_Project_Report_2026_2027.docx` (PDF alongside). The MAI slides are `docs/MAI_Project_Presentation_2026_2027.pptx` (PDF alongside). Root-level copies of the same files are included for submission. Rebuild with `.venv/bin/python mai/build_mai_report.py` and `.venv/bin/python mai/build_mai_presentation.py`. Guide: Dr. Nivedita Mishra. Group 27.
+
 ## Big Data Analytics coursework
 
 `bda/guardianeye_bda_analysis.py` is the Big Data Analytics artefact. It opens a local PySpark session and aggregates prepared image manifests, audio windows, site-stratified splits, synthetic proxy pairs, and the SQLite event log. The written report is `docs/BDA_Project_Report_2026_2027.docx`, with a copy at `BDA_Project_Report_2026_2027.docx`. The submission slides are `docs/BDA_Project_Presentation_2026_2027.pptx`, with a copy at `BDA_Project_Presentation_2026_2027.pptx`.
