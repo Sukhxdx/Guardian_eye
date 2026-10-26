@@ -41,3 +41,9 @@ reports/INDEX.md
 dist/
 build/
 *.log
+
+# LaTeX build artefacts
+mai/*.aux
+mai/*.out
+mai/*.log
+mai/*.synctex.gz
