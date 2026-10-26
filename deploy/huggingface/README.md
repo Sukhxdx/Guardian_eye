@@ -51,10 +51,31 @@ On startup the API calls `huggingface_hub.snapshot_download` into `models/hf/`. 
 
 The container listens on `0.0.0.0:8742`. The dashboard is at `/dashboard`. `GET /` redirects there.
 
+## Push this repo as a Space (script)
+
+```bash
+export HF_TOKEN=hf_...          # write token from https://huggingface.co/settings/tokens
+export HF_SPACE=YourUser/guardianeye
+.venv/bin/python deploy/huggingface/push_space.py
+```
+
+That uploads `deploy/huggingface/Dockerfile` plus `requirements-render.txt`, `src/`, `configs/`, and `scripts/`. Open `https://huggingface.co/spaces/$HF_SPACE`.
+
 ## Other hosts
 
-Render or Railway can build the same Dockerfile.
+Render or Railway can build the same Dockerfile (`Dockerfile.render` at the repo root).
 
-- Set the service port to 8742, or override `GUARDIANEYE_PORT`.
+- Prefer `PORT` from the platform; the entrypoint maps it to `GUARDIANEYE_PORT`.
+- Set `GUARDIANEYE_FAST_UI=1` on small CPU boxes.
 - Set `HF_MODEL_REPO` if you want weights pulled at boot.
 - Do not put `HF_TOKEN` in the image. Use the host's secret store. `.env.example` lists the names.
+
+### Quick public URL without a PaaS
+
+With the API running locally on port 8742:
+
+```bash
+cloudflared tunnel --url http://127.0.0.1:8742
+```
+
+The printed `*.trycloudflare.com` URL proxies `/health` and `/dashboard`. It lasts only while this machine and the tunnel process stay up.
