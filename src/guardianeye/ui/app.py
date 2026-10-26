@@ -468,7 +468,6 @@ def build_demo(pipeline: Pipeline) -> gr.Blocks:
     <span class="ge-chip">{weight_chip}</span>
   </div>
 </div>
-<div class="ge-banner">Proof-of-concept. Indicators, not confirmed poaching. Synthetic proxy pairs are labelled as such.</div>
             """
         )
 
