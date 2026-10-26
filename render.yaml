@@ -16,6 +16,10 @@ services:
         value: "0.0.0.0"
       - key: GUARDIANEYE_NO_UI
         value: "0"
+      - key: GUARDIANEYE_FAST_UI
+        value: "1"
+      - key: GRADIO_ANALYTICS_ENABLED
+        value: "False"
       - key: HF_MODEL_REPO
         sync: false
       - key: HF_TOKEN

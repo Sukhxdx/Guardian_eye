@@ -102,7 +102,12 @@ class AudioInferencer:
         return AudioEvidence(present=True, reliable=True, windows=tuple(scored), note=self.note)
 
     def predict_file(self, path: Path) -> AudioEvidence:
-        """Score a WAV (or other librosa-readable) file."""
+        """Score a WAV (or other librosa-readable) file.
+
+        When no checkpoint is loaded, skip decoding. Librosa on CPU is the
+        dominant cost on free Render instances and is wasted without weights.
+        """
+        if self.model is None:
+            return AudioEvidence(present=True, reliable=False, windows=(), note=self.note)
         audio, _sr = load_audio_file(path, self.sample_rate)
-        evidence = self.predict_array(audio)
-        return evidence
+        return self.predict_array(audio)

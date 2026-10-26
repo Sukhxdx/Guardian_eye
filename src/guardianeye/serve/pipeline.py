@@ -189,15 +189,19 @@ class Pipeline:
                 annotated = annotate(Image.fromarray(rgb), image_ev)
         if audio_path is not None:
             audio_ev = self.audio.predict_file(audio_path)
-            spectrogram = _mel_image(
-                audio_path,
-                self.audio.sample_rate,
-                self.audio.n_mels,
-                self.audio.n_fft,
-                self.audio.hop_length,
-                self.audio.fmin,
-                self.audio.fmax,
-            )
+            # Spectrogram preview needs a full decode; skip when weights are
+            # missing or GUARDIANEYE_FAST_UI=1 (Render-friendly).
+            fast_ui = os.environ.get("GUARDIANEYE_FAST_UI", "0") == "1"
+            if self.audio.reliable and not fast_ui:
+                spectrogram = _mel_image(
+                    audio_path,
+                    self.audio.sample_rate,
+                    self.audio.n_mels,
+                    self.audio.n_fft,
+                    self.audio.hop_length,
+                    self.audio.fmin,
+                    self.audio.fmax,
+                )
         cfg = fusion_config_from_yaml(
             self.fusion_cfg, profile=weight_profile, decision_mode=decision_mode
         )
