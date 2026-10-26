@@ -153,6 +153,11 @@ def slide_title(prs, total):
         "Guide: Dr. Archana Choudary, Assistant Professor, AIML",
         size=14, color=GREEN_SOFT,
     )
+    _add_textbox(
+        slide, Inches(0.7), Inches(3.5), Inches(12), Inches(0.35),
+        "Head of the Department: Dr. Sumit Kumar",
+        size=14, color=GREEN_SOFT,
+    )
 
     members = [
         "Akhil Chivakula — 23070126009",
@@ -160,7 +165,7 @@ def slide_title(prs, total):
         "Khurinji Malar — 23070126059",
         "Sukhada Dhingra — 24070126505",
     ]
-    box = slide.shapes.add_textbox(Inches(0.7), Inches(3.85), Inches(8), Inches(2.2))
+    box = slide.shapes.add_textbox(Inches(0.7), Inches(4.05), Inches(8), Inches(2.0))
     tf = box.text_frame
     p0 = tf.paragraphs[0]
     _set_run(p0.add_run(), "Group members", size=13, bold=True, color=MUTED_GREEN)
@@ -681,8 +686,13 @@ def slide_thanks(prs, page, total):
         _set_run(p.add_run(), m, size=15, color=WHITE)
 
     _add_textbox(
-        slide, Inches(0.7), Inches(6.2), Inches(12), Inches(0.4),
-        "Guide: Dr. Archana Choudary  ·  BDA 0701260704  ·  SIT AIML  ·  AY 2026–2027",
+        slide, Inches(0.7), Inches(5.85), Inches(12), Inches(0.35),
+        "Guide: Dr. Archana Choudary  ·  Head of the Department: Dr. Sumit Kumar",
+        size=12, color=GREEN_SOFT, align=PP_ALIGN.CENTER,
+    )
+    _add_textbox(
+        slide, Inches(0.7), Inches(6.25), Inches(12), Inches(0.35),
+        "BDA 0701260704  ·  SIT AIML  ·  AY 2026–2027",
         size=12, color=GREEN_SOFT, align=PP_ALIGN.CENTER,
     )
     return slide
