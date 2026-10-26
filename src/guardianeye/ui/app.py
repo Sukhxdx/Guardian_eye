@@ -137,10 +137,42 @@ def _history_rows(pipeline: Pipeline) -> list[list[str]]:
     return rows
 
 
-def _sample_paths(pipeline: Pipeline) -> tuple[str | None, str | None]:
+def _showcase_catalog(pipeline: Pipeline) -> list[dict[str, Any]]:
+    path = pipeline.root / "data" / "sample" / "showcase_pairs.jsonl"
+    if path.is_file():
+        return load_jsonl(path)
+    return []
+
+
+def _sample_paths(
+    pipeline: Pipeline, showcase_id: str | None = None
+) -> tuple[str | None, str | None, str, str]:
+    """Return image path, audio path, domain, and a short status message."""
     processed = pipeline.root / "data" / "processed"
     images = load_jsonl(processed / "images" / "manifest.jsonl")
     audio = load_jsonl(processed / "audio" / "manifest.jsonl")
+    by_image = {str(row["id"]): row for row in images}
+    by_audio = {str(row["id"]): row for row in audio}
+    catalog = _showcase_catalog(pipeline)
+    chosen = None
+    if showcase_id and showcase_id != "(default human + gunshot)":
+        chosen = next((row for row in catalog if row.get("title") == showcase_id or row.get("id") == showcase_id), None)
+        if chosen is None:
+            chosen = next((row for row in catalog if row.get("title") == showcase_id), None)
+    if chosen is None and catalog:
+        chosen = catalog[0]
+    if chosen is not None:
+        image = by_image.get(str(chosen.get("image_id")))
+        clip = by_audio.get(str(chosen.get("audio_id")))
+        domain = str(chosen.get("domain") or (image or {}).get("domain") or "camera_trap_rgb")
+        title = str(chosen.get("title") or chosen.get("id") or "sample pair")
+        if image and clip and clip.get("waveform"):
+            return (
+                str(image["image"]),
+                str(clip["waveform"]),
+                domain,
+                f"Loaded showcase: {title}. Run the event to score them.",
+            )
     image = next(
         (
             row
@@ -154,21 +186,27 @@ def _sample_paths(pipeline: Pipeline) -> tuple[str | None, str | None]:
     )
     image_path = str(image["image"]) if image else None
     audio_path = str(clip["waveform"]) if clip else None
-    return image_path, audio_path
+    domain = str((image or {}).get("domain") or "camera_trap_rgb")
+    return (
+        image_path,
+        audio_path,
+        domain,
+        "Loaded a sample camera-trap frame and a sample gunshot clip. Run the event to score them.",
+    )
 
 
 def build_demo(pipeline: Pipeline) -> gr.Blocks:
     """Dashboard used by rangers reviewing one event at a time."""
 
-    def on_sample() -> tuple[Any, Any, str]:
-        image_path, audio_path = _sample_paths(pipeline)
+    showcase_titles = [str(row.get("title") or row.get("id")) for row in _showcase_catalog(pipeline)]
+    if not showcase_titles:
+        showcase_titles = ["(default human + gunshot)"]
+
+    def on_sample(showcase_choice: str) -> tuple[Any, Any, str, str]:
+        image_path, audio_path, domain, message = _sample_paths(pipeline, showcase_choice)
         if not image_path or not audio_path:
-            return None, None, "Sample files are not prepared. Run `make setup` first."
-        return (
-            image_path,
-            audio_path,
-            "Loaded a sample camera-trap frame and a sample gunshot clip. Run the event to score them.",
-        )
+            return None, None, "camera_trap_rgb", "Sample files are not prepared. Run `make setup` first."
+        return image_path, audio_path, domain, message
 
     def on_run(
         visual: str | None,
@@ -257,6 +295,12 @@ A human, a vehicle, or a gunshot-like sound is an **indicator**. It is not, on i
                 info="Night favours audio. Wind favours vision. Rules mode still requires both indicators for HIGH.",
             )
             mode = gr.Dropdown(label="Decision mode", choices=["rules", "weighted"], value="rules")
+        showcase = gr.Dropdown(
+            label="Showcase sample",
+            choices=showcase_titles,
+            value=showcase_titles[0],
+            info="Synthetic variety for demos: day/night frames, thermal, gunshot variants, rain/thunder/insects.",
+        )
         with gr.Row():
             sample_btn = gr.Button("Load sample pair")
             run_btn = gr.Button("Score event", variant="primary")
@@ -285,7 +329,7 @@ A human, a vehicle, or a gunshot-like sound is an **indicator**. It is not, on i
             "Cross-site audio scores and per-domain image scores are reported separately. "
             "Paired-event numbers use a synthetic proxy protocol.</span>"
         )
-        sample_btn.click(on_sample, outputs=[visual, audio, status])
+        sample_btn.click(on_sample, inputs=[showcase], outputs=[visual, audio, domain, status])
         run_btn.click(
             on_run,
             inputs=[visual, audio, domain, profile, mode],
