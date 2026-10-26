@@ -143,7 +143,7 @@ Seeds default to 27.
 
 ## Big Data Analytics coursework
 
-`bda/guardianeye_bda_analysis.py` is the Big Data Analytics artefact. It opens a local PySpark session and aggregates prepared image manifests, audio windows, site-stratified splits, synthetic proxy pairs, and the SQLite event log. The written report is `docs/BDA_Project_Report_2026_2027.docx`, with a copy at `BDA_Project_Report_2026_2027.docx`.
+`bda/guardianeye_bda_analysis.py` is the Big Data Analytics artefact. It opens a local PySpark session and aggregates prepared image manifests, audio windows, site-stratified splits, synthetic proxy pairs, and the SQLite event log. The written report is `docs/BDA_Project_Report_2026_2027.docx`, with a copy at `BDA_Project_Report_2026_2027.docx`. The submission slides are `docs/BDA_Project_Presentation_2026_2027.pptx`, with a copy at `BDA_Project_Presentation_2026_2027.pptx`.
 
 ```bash
 .venv/bin/python bda/guardianeye_bda_analysis.py
