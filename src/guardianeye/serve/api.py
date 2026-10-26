@@ -105,7 +105,12 @@ def main() -> None:
     pipeline = Pipeline.from_configs()
     app = create_app(pipeline)
     host = os.environ.get("GUARDIANEYE_HOST", str(pipeline.serve_cfg.get("host", "0.0.0.0")))
-    port = int(os.environ.get("GUARDIANEYE_PORT", pipeline.serve_cfg.get("port", 8742)))
+    # Render (and most PaaS hosts) inject PORT. Prefer it over the local default.
+    port = int(
+        os.environ.get("PORT")
+        or os.environ.get("GUARDIANEYE_PORT")
+        or pipeline.serve_cfg.get("port", 8742)
+    )
     if os.environ.get("GUARDIANEYE_NO_UI", "0") != "1":
         import gradio as gr
 

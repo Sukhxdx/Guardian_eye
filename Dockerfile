@@ -24,7 +24,8 @@ RUN pip install --upgrade pip \
 
 RUN useradd --create-home --uid 10001 appuser \
     && mkdir -p /app/data /app/models /app/reports \
-    && chown -R appuser:appuser /app
+    && chown -R appuser:appuser /app \
+    && chmod +x /app/deploy/render/entrypoint.sh
 
 USER appuser
 
@@ -35,7 +36,7 @@ RUN python scripts/generate_sample_data.py \
 
 EXPOSE 8742
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8742/health')" || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
+    CMD python -c "import os,urllib.request; p=os.environ.get('PORT','8742'); urllib.request.urlopen(f'http://127.0.0.1:{p}/health')" || exit 1
 
-CMD ["python", "-m", "guardianeye.serve.api"]
+CMD ["/app/deploy/render/entrypoint.sh"]

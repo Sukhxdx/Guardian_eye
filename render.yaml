@@ -1,0 +1,23 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# Connect a GitHub/GitLab mirror of this repo, then: Dashboard → New → Blueprint
+# Use at least Standard (2 GB). Free/Starter (512 MB) will OOM on torch + Gradio.
+
+services:
+  - type: web
+    name: guardianeye
+    runtime: docker
+    plan: standard
+    region: oregon
+    dockerfilePath: ./Dockerfile.render
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: GUARDIANEYE_HOST
+        value: "0.0.0.0"
+      - key: GUARDIANEYE_NO_UI
+        value: "0"
+      - key: HF_MODEL_REPO
+        sync: false
+      - key: HF_TOKEN
+        sync: false
+    autoDeploy: true

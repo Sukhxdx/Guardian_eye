@@ -155,6 +155,12 @@ The Multimodal AI (MAI) written report is an **IEEE conference paper** (`IEEEtra
 
 The job writes `reports/bda/summary.json` and `reports/bda/aggregation.csv`. Those files count the prepared metadata. They are not model metrics. A Java runtime is required for the Spark session. Download URLs in `configs/data.yaml` stay `TODO`.
 
+## Deploy on Render
+
+Render-ready files: `render.yaml`, `Dockerfile.render`, `requirements-render.txt`, and `deploy/render/entrypoint.sh`. The API binds to the platform `PORT`. Full steps: `deploy/render/README.md`.
+
+Use a **Standard (2 GB)** Render web service or larger. Push a GitHub/GitLab mirror of this repo, then create a Blueprint from `render.yaml`. Health check: `/health`. Dashboard: `/dashboard`.
+
 ## Limitations
 
 - No public dataset here has a poacher label, and none aligns an image with the audio of the same moment. Fusion scores from `build_paired_events.py` are a **synthetic proxy**.
