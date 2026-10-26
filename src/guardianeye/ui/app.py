@@ -462,8 +462,8 @@ def build_demo(pipeline: Pipeline) -> gr.Blocks:
     A human, vehicle, or gunshot-like score is an <strong>indicator</strong> — not confirmed poaching.
   </p>
   <div class="ge-chip-row">
-    <span class="ge-chip"><strong>MAI</strong> Group 27</span>
     <span class="ge-chip">Late fusion</span>
+    <span class="ge-chip">Image + audio</span>
     <span class="ge-chip">Belize ↔ Vietnam audio</span>
     <span class="ge-chip">{weight_chip}</span>
   </div>

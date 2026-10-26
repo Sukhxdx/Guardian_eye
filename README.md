@@ -4,7 +4,7 @@ GuardianEye is a two-modality review tool for wildlife rangers. It looks for **i
 
 Video is not a third modality. Frames are sampled from it and sent through the image branch.
 
-This is an academic mini-project (Multimodal AI, Group 27).
+This is an academic mini-project for wildlife indicator review.
 
 **Proof-of-concept. Indicators, not confirmed poaching.**
 
@@ -141,13 +141,11 @@ Everything tunable is in `configs/`:
 
 Seeds default to 27.
 
-## Multimodal AI coursework
+## Reports and analysis artefacts
 
-The Multimodal AI (MAI) written report is an **IEEE conference paper** (`IEEEtran`): source `mai/MAI_IEEE_Conference_Paper.tex`, PDF `docs/MAI_Project_Report_2026_2027.pdf` (also `docs/MAI_IEEE_Conference_Paper.pdf`). Rebuild with `.venv/bin/python mai/build_mai_report.py` (requires `pdflatex`). The MAI slides remain `docs/MAI_Project_Presentation_2026_2027.pptx` (PDF alongside); rebuild with `.venv/bin/python mai/build_mai_presentation.py`. Guide: Dr. Nivedita Mishra. Group 27.
+IEEE-style paper sources and rebuild scripts live under `mai/`; PDF and slide copies are under `docs/`. Rebuild with `.venv/bin/python mai/build_mai_report.py` (needs `pdflatex`) and `.venv/bin/python mai/build_mai_presentation.py`.
 
-## Big Data Analytics coursework
-
-`bda/guardianeye_bda_analysis.py` is the Big Data Analytics artefact. It opens a local PySpark session and aggregates prepared image manifests, audio windows, site-stratified splits, synthetic proxy pairs, and the SQLite event log. The written report is `docs/BDA_Project_Report_2026_2027.docx`, with a copy at `BDA_Project_Report_2026_2027.docx`. The submission slides are `docs/BDA_Project_Presentation_2026_2027.pptx`, with a copy at `BDA_Project_Presentation_2026_2027.pptx`.
+`bda/guardianeye_bda_analysis.py` opens a local PySpark session and aggregates prepared image manifests, audio windows, site-stratified splits, synthetic proxy pairs, and the SQLite event log. Written report and slides are under `docs/` (copies also at the repo root).
 
 ```bash
 .venv/bin/python bda/guardianeye_bda_analysis.py

@@ -9,7 +9,7 @@ description = "Late-fusion image and audio indicators for wildlife poaching evid
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-authors = [{ name = "Group 27" }]
+authors = [{ name = "GuardianEye" }]
 
 [tool.setuptools.packages.find]
 where = ["src"]
