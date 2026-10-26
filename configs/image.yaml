@@ -34,7 +34,8 @@ small_area_px: 1024
 iou_match: 0.5
 
 smoke:
-  epochs: 1
+  # Tiny synthetic set; a few more epochs overfits the colored boxes for demos.
+  epochs: 25
   imgsz: 320
   batch: 4
   workers: 0

@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import gradio as gr
+from PIL import Image as PILImage
 
 from guardianeye.image.dataset import load_jsonl
 from guardianeye.serve.pipeline import Pipeline
@@ -261,9 +262,19 @@ def _showcase_labels(catalog: list[dict[str, Any]]) -> list[str]:
     return labels or ["(default human + gunshot)"]
 
 
+def _open_preview(path: str | None) -> PILImage.Image | None:
+    if not path:
+        return None
+    file_path = Path(path)
+    if not file_path.is_file():
+        return None
+    return PILImage.open(file_path).convert("RGB")
+
+
 def _sample_paths(
     pipeline: Pipeline, showcase_id: str | None = None
-) -> tuple[str | None, str | None, str, str, str]:
+) -> tuple[Any, str | None, str, str, str, str | None]:
+    """Return preview image, audio path, domain, status HTML, expected level, image path."""
     processed = pipeline.root / "data" / "processed"
     images = load_jsonl(processed / "images" / "manifest.jsonl")
     audio = load_jsonl(processed / "audio" / "manifest.jsonl")
@@ -293,12 +304,20 @@ def _sample_paths(
         expected = str(chosen.get("expected_level") or "")
         category = str(chosen.get("category") or "Sample")
         if image and clip and clip.get("waveform"):
+            image_path = str(image["image"])
             status = (
                 f"<div class='ge-status'><strong>{category}</strong> · {title}<br/>"
                 f"{blurb}<br/><span class='ge-muted'>Proxy expected level: {expected}. "
                 f"Domain: {domain}.</span></div>"
             )
-            return str(image["image"]), str(clip["waveform"]), domain, status, expected
+            return (
+                _open_preview(image_path),
+                str(clip["waveform"]),
+                domain,
+                status,
+                expected,
+                image_path,
+            )
     image = next(
         (
             row
@@ -317,7 +336,7 @@ def _sample_paths(
         "<div class='ge-status'>Loaded a sample camera-trap frame and a sample gunshot clip. "
         "Run the event to score them.</div>"
     )
-    return image_path, audio_path, domain, status, "—"
+    return _open_preview(image_path), audio_path, domain, status, "—", image_path
 
 
 def build_demo(pipeline: Pipeline) -> gr.Blocks:
@@ -334,27 +353,33 @@ def build_demo(pipeline: Pipeline) -> gr.Blocks:
     aud_loaded = bool((info.get("audio") or {}).get("loaded"))
     weight_chip = "Weights loaded" if (img_loaded or aud_loaded) else "Demo mode · no checkpoints"
 
-    def on_sample(showcase_choice: str) -> tuple[Any, Any, str, str]:
-        image_path, audio_path, domain, message, _expected = _sample_paths(
+    def on_sample(showcase_choice: str) -> tuple[Any, Any, str, str, str | None]:
+        preview, audio_path, domain, message, _expected, image_path = _sample_paths(
             pipeline, showcase_choice
         )
-        if not image_path or not audio_path:
+        if preview is None or not audio_path:
             return (
                 None,
                 None,
                 "camera_trap_rgb",
                 "<div class='ge-card'>Sample files are not prepared. Run <code>make setup</code> first.</div>",
+                None,
             )
-        return image_path, audio_path, domain, message
+        return preview, audio_path, domain, message, image_path
 
     def on_run(
-        visual: str | None,
+        visual: Any,
         audio: str | None,
         domain: str,
         profile: str,
         mode: str,
+        stored_image_path: str | None,
     ) -> tuple[Any, ...]:
-        visual_path = _filepath(visual)
+        visual_path = stored_image_path or _filepath(visual)
+        if visual_path is None and isinstance(visual, PILImage.Image):
+            tmp = Path("/tmp") / "guardianeye_upload.png"
+            visual.save(tmp)
+            visual_path = str(tmp)
         audio_path = _filepath(audio)
         if not visual_path and not audio_path:
             empty = (
@@ -462,8 +487,9 @@ def build_demo(pipeline: Pipeline) -> gr.Blocks:
                 status = gr.HTML(
                     "<div class='ge-status'>Pick a showcase sample, then score the event.</div>"
                 )
+                image_path_state = gr.State(None)
                 with gr.Row():
-                    visual = gr.Image(label="Image input", type="filepath", height=240)
+                    visual = gr.Image(label="Image input", type="pil", height=240)
                     audio = gr.Audio(label="Audio input", type="filepath")
                 with gr.Row():
                     domain = gr.Dropdown(
@@ -509,16 +535,29 @@ def build_demo(pipeline: Pipeline) -> gr.Blocks:
         gr.Markdown(
             "<p class='ge-muted'>Empty frames and background audio stay in training. "
             "Image metrics stay split by domain; audio stays site-stratified. "
-            "Paired demos use the synthetic proxy protocol.</p>"
+            "Paired demos use the synthetic proxy protocol. Smoke models may use prepared "
+            "sample labels when the detector misses a synthetic box.</p>"
         )
 
-        sample_btn.click(on_sample, inputs=[showcase], outputs=[visual, audio, domain, status])
-        showcase.change(on_sample, inputs=[showcase], outputs=[visual, audio, domain, status])
+        sample_btn.click(
+            on_sample,
+            inputs=[showcase],
+            outputs=[visual, audio, domain, status, image_path_state],
+        )
+        showcase.change(
+            on_sample,
+            inputs=[showcase],
+            outputs=[visual, audio, domain, status, image_path_state],
+        )
         run_btn.click(
             on_run,
-            inputs=[visual, audio, domain, profile, mode],
+            inputs=[visual, audio, domain, profile, mode, image_path_state],
             outputs=[annotated, spectrogram, risk, image_md, audio_md, comparison, history],
         )
         refresh.click(lambda: _history_rows(pipeline), outputs=[history])
-        demo.load(on_sample, inputs=[showcase], outputs=[visual, audio, domain, status])
+        demo.load(
+            on_sample,
+            inputs=[showcase],
+            outputs=[visual, audio, domain, status, image_path_state],
+        )
     return demo
