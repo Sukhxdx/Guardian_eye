@@ -47,3 +47,4 @@ mai/*.aux
 mai/*.out
 mai/*.log
 mai/*.synctex.gz
+bda/_code_pdf_build/
