@@ -1,0 +1,290 @@
+{
+  "audio": {
+    "background_clips_retained": 20,
+    "by_representation": {
+      "log_mel": 28,
+      "spectrogram_image": 1
+    },
+    "by_site": {
+      "belize": 14,
+      "vietnam": 15
+    },
+    "by_site_and_label": {
+      "belize": {
+        "background": 10,
+        "gunshot": 4
+      },
+      "vietnam": {
+        "background": 10,
+        "gunshot": 5
+      }
+    },
+    "by_variant": {
+      "ambient": 16,
+      "impulse_shot": 8,
+      "snap": 2,
+      "spectrogram_image": 1,
+      "thunder": 2
+    },
+    "imbalance_ratio_max_over_min": {
+      "belize": 2.5,
+      "vietnam": 2.0
+    },
+    "records": 29
+  },
+  "audio_splits": {
+    "by_experiment_and_split": {
+      "belize_to_vietnam": {
+        "test": 14,
+        "train": 11,
+        "val": 3
+      },
+      "in_domain_belize": {
+        "test": 3,
+        "train": 8,
+        "val": 3
+      },
+      "in_domain_vietnam": {
+        "test": 3,
+        "train": 8,
+        "val": 3
+      },
+      "vietnam_to_belize": {
+        "test": 14,
+        "train": 11,
+        "val": 3
+      }
+    },
+    "by_experiment_split_site": {
+      "belize_to_vietnam": {
+        "test": {
+          "vietnam": 14
+        },
+        "train": {
+          "belize": 11
+        },
+        "val": {
+          "belize": 3
+        }
+      },
+      "in_domain_belize": {
+        "test": {
+          "belize": 3
+        },
+        "train": {
+          "belize": 8
+        },
+        "val": {
+          "belize": 3
+        }
+      },
+      "in_domain_vietnam": {
+        "test": {
+          "vietnam": 3
+        },
+        "train": {
+          "vietnam": 8
+        },
+        "val": {
+          "vietnam": 3
+        }
+      },
+      "vietnam_to_belize": {
+        "test": {
+          "belize": 14
+        },
+        "train": {
+          "vietnam": 11
+        },
+        "val": {
+          "vietnam": 3
+        }
+      }
+    },
+    "by_experiment_split_site_label": {
+      "belize_to_vietnam": {
+        "test": {
+          "vietnam": {
+            "background": 10,
+            "gunshot": 4
+          }
+        },
+        "train": {
+          "belize": {
+            "background": 8,
+            "gunshot": 3
+          }
+        },
+        "val": {
+          "belize": {
+            "background": 2,
+            "gunshot": 1
+          }
+        }
+      },
+      "in_domain_belize": {
+        "test": {
+          "belize": {
+            "background": 2,
+            "gunshot": 1
+          }
+        },
+        "train": {
+          "belize": {
+            "background": 6,
+            "gunshot": 2
+          }
+        },
+        "val": {
+          "belize": {
+            "background": 2,
+            "gunshot": 1
+          }
+        }
+      },
+      "in_domain_vietnam": {
+        "test": {
+          "vietnam": {
+            "background": 2,
+            "gunshot": 1
+          }
+        },
+        "train": {
+          "vietnam": {
+            "background": 6,
+            "gunshot": 2
+          }
+        },
+        "val": {
+          "vietnam": {
+            "background": 2,
+            "gunshot": 1
+          }
+        }
+      },
+      "vietnam_to_belize": {
+        "test": {
+          "belize": {
+            "background": 10,
+            "gunshot": 4
+          }
+        },
+        "train": {
+          "vietnam": {
+            "background": 8,
+            "gunshot": 3
+          }
+        },
+        "val": {
+          "vietnam": {
+            "background": 2,
+            "gunshot": 1
+          }
+        }
+      }
+    },
+    "files": 4,
+    "records": 84
+  },
+  "engine": {
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "master": "local[2]",
+    "name": "pyspark",
+    "version": "4.0.1"
+  },
+  "event_log": {
+    "alerted": 0,
+    "by_domain": {
+      "camera_trap_rgb": 1
+    },
+    "by_reason": {
+      "unreliable_weights": 1
+    },
+    "by_risk_level": {
+      "LOW": 1
+    },
+    "not_alerted": 1,
+    "records": 1,
+    "windows_1h": [
+      {
+        "alerted": 0,
+        "end": "2026-10-26 11:00:00",
+        "mean_latency_ms": 969.823,
+        "not_alerted": 1,
+        "start": "2026-10-26 10:00:00"
+      }
+    ]
+  },
+  "image": {
+    "by_domain": {
+      "aerial_thermal": 11,
+      "camera_trap_rgb": 11
+    },
+    "by_domain_and_class": {
+      "aerial_thermal": {
+        "animal": 2,
+        "empty": 6,
+        "human": 2,
+        "vehicle": 1
+      },
+      "camera_trap_rgb": {
+        "animal": 2,
+        "empty": 6,
+        "human": 2,
+        "vehicle": 1
+      }
+    },
+    "by_domain_and_split": {
+      "aerial_thermal": {
+        "test": 1,
+        "train": 7,
+        "val": 3
+      },
+      "camera_trap_rgb": {
+        "test": 1,
+        "train": 7,
+        "val": 3
+      }
+    },
+    "by_source": {
+      "sample_birdsai": 11,
+      "sample_camera_trap": 11
+    },
+    "empty_images_retained": 12,
+    "imbalance_ratio_max_over_min": {
+      "aerial_thermal": 6.0,
+      "camera_trap_rgb": 6.0
+    },
+    "records": 22,
+    "small_object_images": 2
+  },
+  "note": "Analytical summary of prepared indicator metadata. Not model metrics. Fusion pairs use the synthetic proxy protocol.",
+  "seed": 27,
+  "synthetic_proxy_pairs": {
+    "by_domain": {
+      "aerial_thermal": 8,
+      "camera_trap_rgb": 8
+    },
+    "by_expected_level": {
+      "HIGH": 6,
+      "LOW": 4,
+      "MEDIUM": 6
+    },
+    "by_protocol": {
+      "synthetic_proxy": 16
+    },
+    "by_scenario": {
+      "animal_background": 2,
+      "empty_gunshot": 2,
+      "empty_impulse": 2,
+      "human_background": 2,
+      "human_gunshot": 2,
+      "small_human_gunshot": 2,
+      "vehicle_background": 2,
+      "vehicle_gunshot": 2
+    },
+    "note": "Constructed pairs. Not time-aligned field incidents.",
+    "protocol": "synthetic_proxy",
+    "records": 16
+  }
+}

@@ -26,3 +26,6 @@ scipy==1.15.1
 pytest==8.3.4
 ruff==0.9.3
 mypy==1.14.1
+
+# Local Spark session for bda/guardianeye_bda_analysis.py.
+pyspark==4.0.1
