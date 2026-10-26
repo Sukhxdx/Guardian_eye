@@ -1,0 +1,167 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{url}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue}
+
+\begin{document}
+
+\title{GuardianEye: Late Multimodal Fusion of Visual and Acoustic Indicators for Wildlife Monitoring}
+
+\author{
+\IEEEauthorblockN{Akhil Chivakula\textsuperscript{1}, Dipti Kothari\textsuperscript{1}, Khurinji Malar\textsuperscript{1}, Sukhada Dhingra\textsuperscript{1}}
+\IEEEauthorblockA{\textit{Department of Artificial Intelligence and Machine Learning}\\
+\textit{Symbiosis Institute of Technology, Symbiosis International (Deemed University)}\\
+Pune, India\\
+PRN: 23070126009, 23070126040, 23070126059, 24070126505\\
+Guide: Dr.~Nivedita Mishra}
+}
+
+\maketitle
+
+\begin{abstract}
+GuardianEye is a multimodal system that reviews wildlife evidence by combining two unimodal predictors at decision time. Camera-trap RGB frames and aerial thermal frames are processed by domain-specific YOLOv8 detectors. Short audio clips are converted to log-mel spectrograms and classified by a convolutional network. Video is sampled into frames and follows the image branch; it is not treated as a third modality. The branches meet only in a late-fusion stage that emits HIGH, MEDIUM, or LOW risk from human or vehicle detections and gunshot-like scores. One detection is an indicator, not a confirmed poaching event. Because public collections used here lack time-aligned image--audio incidents and a labelled poacher class, fusion pairs are constructed under an explicitly labelled synthetic proxy protocol. Empty images and background audio are retained. Audio evaluation is site-stratified between Belize and Vietnam, including both transfer directions and in-domain controls. A FastAPI service and Gradio dashboard expose multimodal inference with checkpoint honesty reporting. Corpus metadata in the working tree comprise 22 images, 29 audio windows, and 16 synthetic proxy pairs; no detection checkpoint is present, so precision, recall, F1, and mAP are not reported.
+\end{abstract}
+
+\begin{IEEEkeywords}
+multimodal learning, late fusion, object detection, acoustic event classification, wildlife monitoring, domain shift
+\end{IEEEkeywords}
+
+\section{Introduction}
+Patrol archives mix RGB camera-trap stills, aerial thermal frames, and short acoustic clips. The streams are seldom synchronised, and a single sensor reading is incomplete. GuardianEye frames this setting as multimodal artificial intelligence: specialised unimodal encoders extract modality-specific indicators, and a late-fusion module combines those indicators into a reviewable risk level.
+
+Early joint encoders would require paired, time-aligned samples at training scale. The collections named in the project configuration do not supply that alignment, nor a labelled poacher class. The design therefore keeps representation learning unimodal, fuses only scores and timestamps, and degrades when a modality is missing. Animal boxes are recorded and are excluded from poaching indicators. The banner shared with operators states that the system is a proof-of-concept for indicators, not confirmed poaching.
+
+Configuration resides in YAML files under \texttt{configs/}. The random seed is 27. Dataset download URLs remain placeholders until supplied by an operator; no fabricated URLs are used.
+
+\section{Related Framing}
+Multimodal pipelines for ecological monitoring often couple vision with sound. The present work differs in three operational constraints. First, visual domains are trained and scored separately (\texttt{aerial\_thermal} versus \texttt{camera\_trap\_rgb}). Second, acoustic generalisation is measured under geographic transfer rather than a single shuffled pool. Third, fusion evaluation admits that field-aligned pairs are unavailable and labels every constructed pair as a synthetic proxy. These choices keep multimodal claims bounded by the data that actually exist in the repository.
+
+\section{Multimodal Problem Formulation}
+\subsection{Modalities and classes}
+The visual modality admits human, vehicle, animal, and empty outcomes. Empty frames carry no boxes and remain in training as negatives. Visual indicators admitted to fusion are human and vehicle only. The acoustic modality admits background and gunshot. Background includes ambient sound and impulse-like distractors tagged on the manifest. Background clips are retained so that the negative class remains visible to the classifier.
+
+\subsection{Late fusion rationale}
+Late fusion preserves specialised losses and evaluation protocols per modality, permits independent calibration, and supports missing-modality operation. The fusion stage consumes detection scores and timestamps, not raw pixels or waveforms. Rules mode in \texttt{configs/fusion.yaml} is the primary policy. Inclusive thresholds of $0.50$ mark a strong image indicator and a strong gunshot score. When only one reliable modality is present, unimodal thresholds of $0.85$ apply and the level cannot be HIGH. Coincidence uses a $5.0$\,s expansion of the audio window.
+
+HIGH requires a human or vehicle detection and a gunshot score, both at or above threshold, inside that window, and is the default alert. MEDIUM covers exactly one strong indicator, or both indicators outside the window. LOW covers neither. Weight profiles \emph{balanced}, \emph{night}, and \emph{wind} rescale numeric scores when weighted mode is selected.
+
+\section{System Architecture}
+Fig.~\ref{fig:arch} summarises the pipeline. The image branch runs YOLOv8 once per visual domain. The audio branch maps each clip to a fixed log-mel matrix and classifies it with a small convolutional network. Fusion applies the rule set, writes an audit row to SQLite, and returns the decision through FastAPI with a Gradio dashboard at \texttt{/dashboard}.
+
+\begin{figure}[t]
+\centering
+\fbox{\parbox{0.92\columnwidth}{\centering\footnotesize
+\textbf{Image:} frames / thermal replicate $\rightarrow$ YOLOv8 (per domain)\\[2pt]
+\textbf{Audio:} WAV $\rightarrow$ 3\,s log-mel ($64$ bins) $\rightarrow$ CNN\\[2pt]
+\textbf{Fusion:} rules + $5$\,s window $\rightarrow$ HIGH / MEDIUM / LOW\\[2pt]
+\textbf{Serve:} FastAPI :8742, Gradio \texttt{/dashboard}, SQLite audit
+}}
+\caption{GuardianEye multimodal architecture: unimodal encoders with late decision fusion.}
+\label{fig:arch}
+\end{figure}
+
+Missing-modality handling is explicit. An upload that contains only an image or only an audio clip still receives a score. \texttt{GET /model-info} reports, for each domain and for audio, whether a checkpoint was loaded. When weights are absent, the service states that the corresponding evidence is not reliable.
+
+\section{Visual Modality}
+The image trainer executes one YOLOv8 run per domain with base weights \texttt{yolov8n.pt}. The configured schedule uses $50$ epochs, image size $640$, and batch size $8$ on CPU by default. Aerial thermal frames use channel replication into three identical channels so that an RGB backbone can be reused without inventing false colour.
+
+Class imbalance is addressed by oversampling rare box classes inside a copy of the training split. Empty frames are not discarded. Evaluation scores \texttt{aerial\_thermal} and \texttt{camera\_trap\_rgb} separately. When checkpoints exist, detection metrics are written under \texttt{reports/} by evaluation scripts and are never hardcoded in this paper.
+
+\section{Audio Modality and Cross-Site Transfer}
+Audio preparation resamples to $16$\,kHz and cuts windows of $3.0$\,s. Each window becomes a $64$-bin log-mel matrix. The default classifier comprises three convolutional blocks with batch normalisation and ReLU activations, adaptive pooling, and a linear head over two classes. Training uses class-weighted cross-entropy.
+
+Four experiments isolate geographic transfer. \texttt{belize\_to\_vietnam} trains and validates on Belize and tests on all of Vietnam; \texttt{vietnam\_to\_belize} reverses the sites. \texttt{in\_domain\_belize} and \texttt{in\_domain\_vietnam} each split one site. Validation is drawn only from the training site. Fusion later inherits whatever site shift the acoustic encoder exhibits.
+
+\section{Synthetic Proxy Multimodal Evaluation}
+No public set used here aligns an image with the audio of the same incident. Pair construction therefore builds labelled scenarios and tags every row with protocol \texttt{synthetic\_proxy}. Eight scenarios are applied in each image domain, spanning joint indicators (e.g., human with gunshot), single-modality indicators, and negatives (e.g., animal with background). Expected levels follow the fusion rules. When both branches load, fusion evaluation compares image-only, audio-only, and fused decisions; a missing checkpoint leaves those score files empty.
+
+\section{Multimodal Serving}
+The service binds to port $8742$. The Gradio interface accepts image and audio in one interaction. Every decision is logged to \texttt{data/events.sqlite}, including non-alerts. Snapshots and audio copies are stored under \texttt{data/events/}. The interface banner states that outputs are indicators, not confirmed poaching.
+
+\section{Empirical Characterisation of the Corpus}
+Tables~\ref{tab:img}--\ref{tab:proxy} report metadata counts from the prepared corpus in the working tree. They are not precision, recall, F1, mAP, or false-positive rate. The \texttt{models/} directory contains no checkpoint; detection metrics are therefore omitted.
+
+\begin{table}[t]
+\caption{Image records by domain and primary class.}
+\label{tab:img}
+\centering
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Domain & Human & Vehicle & Animal & Empty & Total \\
+\midrule
+aerial\_thermal & 2 & 1 & 2 & 6 & 11 \\
+camera\_trap\_rgb & 2 & 1 & 2 & 6 & 11 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Audio windows by site and label.}
+\label{tab:aud}
+\centering
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Site & Gunshot & Background & Total \\
+\midrule
+Belize & 4 & 10 & 14 \\
+Vietnam & 5 & 10 & 15 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Audio experiment split sizes (assignment rows).}
+\label{tab:split}
+\centering
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Experiment & Train & Val & Test \\
+\midrule
+belize\_to\_vietnam & 11 & 3 & 14 \\
+vietnam\_to\_belize & 11 & 3 & 14 \\
+in\_domain\_belize & 8 & 3 & 3 \\
+in\_domain\_vietnam & 8 & 3 & 3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Synthetic proxy pairs by expected fusion level.}
+\label{tab:proxy}
+\centering
+\begin{tabular}{@{}lc@{}}
+\toprule
+Expected level & Pairs \\
+\midrule
+HIGH & 6 \\
+MEDIUM & 6 \\
+LOW & 4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Twelve of twenty-two images are empty; twenty of twenty-nine audio windows are background. Imbalance ratios are $6.0$ per image domain and $2.5$ / $2.0$ for Belize / Vietnam. Sixteen synthetic proxy pairs cover eight scenarios across both visual domains. The audit log in this tree holds one event that was not alerted, with reason code consistent with unreliable weights when checkpoints are absent.
+
+\section{Conclusion}
+GuardianEye implements late multimodal fusion of visual and acoustic indicators for wildlife review. Unimodal branches remain specialised; fusion is rules-based, time-aware, and explicit about missing modalities. Site stratification and retention of empty and background samples keep evaluation aligned with the negative class. Synthetic proxy pairs stand in where field-aligned multimodal data do not exist. Serving exposes multimodal uploads with checkpoint honesty. Detection scores are deferred to evaluation scripts that run only after weights are present.
+
+\section*{Acknowledgment}
+The authors thank Dr.~Nivedita Mishra, Assistant Professor, Department of Artificial Intelligence and Machine Learning, Symbiosis Institute of Technology, for guidance of this Multimodal AI work, and Dr.~Sumit Kumar, Head of the Department, for departmental support. Academic year 2026--2027; Group~27.
+
+\begin{thebibliography}{00}
+\bibitem{yolo} J.~Redmon, S.~Divvala, R.~Girshick, and A.~Farhadi, ``You only look once: Unified, real-time object detection,'' in \textit{Proc.\ IEEE Conf.\ Comput.\ Vis.\ Pattern Recognit.\ (CVPR)}, 2016, pp.\ 779--788.
+\bibitem{ultralytics} G.~Jocher, A.~Chaurasia, and J.~Qiu, ``Ultralytics YOLOv8,'' 2023. [Online]. Available: \url{https://github.com/ultralytics/ultralytics}
+\bibitem{panns} Q.~Kong, Y.~Cao, T.~Iqbal, Y.~Wang, W.~Wang, and M.~D.~Plumbley, ``PANNs: Large-scale pretrained audio neural networks for audio pattern recognition,'' \textit{IEEE/ACM Trans.\ Audio, Speech, Lang.\ Process.}, vol.~28, pp.\ 2880--2894, 2020.
+\bibitem{baltru} T.~Baltru\v{s}aitis, C.~Ahuja, and L.-P.~Morency, ``Multimodal machine learning: A survey and taxonomy,'' \textit{IEEE Trans.\ Pattern Anal.\ Mach.\ Intell.}, vol.~41, no.~2, pp.\ 423--443, Feb.~2019.
+\bibitem{guardianeye} GuardianEye project configuration and source, Symbiosis Institute of Technology, Multimodal AI (MAI), Group~27, AY~2026--2027.
+\end{thebibliography}
+
+\end{document}
