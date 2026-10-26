@@ -15,33 +15,145 @@ from guardianeye.serve.pipeline import Pipeline
 from guardianeye.ui.reports_view import reports_markdown
 
 CSS = """
-.gradio-container { max-width: 1100px !important; }
-.ge-banner {
-  background: #1c3428;
-  color: #f6f1e7;
-  border-left: 8px solid #d3922a;
-  padding: 14px 16px;
-  font-size: 1.05rem;
-  font-weight: 650;
-  letter-spacing: 0.01em;
-  margin-bottom: 0.75rem;
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
+
+:root {
+  --ge-ink: #102018;
+  --ge-forest: #1a3d2e;
+  --ge-moss: #2f6b4f;
+  --ge-leaf: #3d8f68;
+  --ge-amber: #c9842a;
+  --ge-sand: #f3efe6;
+  --ge-card: #fffcf7;
+  --ge-line: #d7d0c3;
+  --ge-muted: #5e675f;
+  --ge-high: #9b2f1f;
+  --ge-med: #9a6a14;
+  --ge-low: #1f5a40;
 }
-.ge-risk {
-  padding: 16px;
-  border-radius: 8px;
+
+.gradio-container {
+  max-width: 1180px !important;
+  font-family: "DM Sans", "Segoe UI", sans-serif !important;
+  color: var(--ge-ink) !important;
+  background:
+    radial-gradient(1200px 480px at 10% -10%, rgba(61, 143, 104, 0.18), transparent 55%),
+    radial-gradient(900px 420px at 100% 0%, rgba(201, 132, 42, 0.14), transparent 50%),
+    linear-gradient(180deg, #f7f4ee 0%, #efebe3 100%) !important;
+}
+
+.ge-hero {
+  display: grid;
+  gap: 10px;
+  padding: 22px 24px 20px;
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(26, 61, 46, 0.96), rgba(47, 107, 79, 0.92)),
+    var(--ge-forest);
   color: #f7f3ea;
+  box-shadow: 0 18px 40px rgba(16, 32, 24, 0.18);
+  border: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 14px;
 }
-.ge-risk h2 { margin: 0 0 6px 0; font-size: 1.6rem; }
+.ge-brand {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 2.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+}
+.ge-tagline {
+  margin: 0;
+  max-width: 46rem;
+  color: rgba(247, 243, 234, 0.88);
+  font-size: 1.02rem;
+  line-height: 1.45;
+}
+.ge-chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.ge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.16);
+}
+.ge-chip strong { color: #f0c56d; font-weight: 700; }
+.ge-banner {
+  background: linear-gradient(90deg, #7a2a18, #9b2f1f);
+  color: #fff7f2;
+  border-left: 6px solid #f0c56d;
+  padding: 11px 14px;
+  font-size: 0.95rem;
+  font-weight: 650;
+  border-radius: 10px;
+  margin-bottom: 14px;
+}
+
+.ge-section-title {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ge-forest);
+  margin: 4px 0 2px;
+}
+
+.ge-panel {
+  background: var(--ge-card);
+  border: 1px solid var(--ge-line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 8px 24px rgba(16, 32, 24, 0.04);
+}
+
+.ge-risk {
+  padding: 18px 18px 16px;
+  border-radius: 14px;
+  color: #fff8f1;
+  box-shadow: 0 12px 28px rgba(16, 32, 24, 0.12);
+}
+.ge-risk h2 {
+  margin: 0 0 8px 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.85rem;
+  letter-spacing: -0.02em;
+}
+.ge-risk .ge-meta {
+  display: grid;
+  gap: 4px;
+  opacity: 0.95;
+  font-size: 0.95rem;
+}
+
 .ge-card {
-  border: 1px solid #d9d3c7;
-  border-radius: 8px;
-  padding: 10px 12px;
-  background: #fbf8f2;
+  border: 1px solid var(--ge-line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: var(--ge-card);
 }
-.ge-muted { color: #5c564c; font-size: 0.92rem; }
+.ge-muted { color: var(--ge-muted); font-size: 0.9rem; }
+
+.ge-status {
+  border-left: 4px solid var(--ge-leaf);
+  background: rgba(61, 143, 104, 0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--ge-forest);
+  font-weight: 500;
+}
+
+button.primary, .primary {
+  background: linear-gradient(180deg, var(--ge-leaf), var(--ge-moss)) !important;
+  border: none !important;
+}
 """
 
-LEVEL_COLORS = {"HIGH": "#8c2f1b", "MEDIUM": "#8a5a12", "LOW": "#1e4d38"}
+LEVEL_COLORS = {"HIGH": "#9b2f1f", "MEDIUM": "#9a6a14", "LOW": "#1f5a40"}
 
 
 def _risk_html(event: dict[str, Any]) -> str:
@@ -55,11 +167,12 @@ def _risk_html(event: dict[str, Any]) -> str:
     return (
         f"<div class='ge-risk' style='background:{color}'>"
         f"<h2>{level}</h2>"
+        f"<div class='ge-meta'>"
         f"<div>{alert}</div>"
-        f"<div>Weighted score for this event: {score_text}</div>"
+        f"<div>Weighted score: {score_text}</div>"
         f"<div>Pipeline latency: {latency_text}</div>"
         f"<div>{event.get('reason', '')}</div>"
-        f"</div>"
+        f"</div></div>"
     )
 
 
@@ -68,24 +181,21 @@ def _evidence_md(title: str, payload: dict[str, Any]) -> str:
     reliable = payload.get("reliable")
     note = payload.get("note") or ""
     lines = [
-        f"**{title}**",
+        f"### {title}",
         "",
-        f"File supplied: {bool(present)}",
-        f"Weights reliable: {bool(reliable)}",
+        f"- File supplied: **{bool(present)}**",
+        f"- Weights reliable: **{bool(reliable)}**",
     ]
     if "per_class_max" in payload:
-        lines.append("")
-        lines.append("Max confidence by class:")
+        lines.append("- Max confidence by class:")
         for name, value in payload.get("per_class_max", {}).items():
-            lines.append(f"- {name}: {float(value):.3f}")
+            lines.append(f"  - `{name}`: {float(value):.3f}")
     if payload.get("gunshot_probability") is not None:
-        lines.append("")
-        lines.append(f"Gunshot probability: {float(payload['gunshot_probability']):.3f}")
+        lines.append(f"- Gunshot probability: **{float(payload['gunshot_probability']):.3f}**")
     elif "windows" in payload:
-        lines.append("")
-        lines.append("Gunshot probability: not produced (weights not loaded).")
+        lines.append("- Gunshot probability: not produced (weights not loaded)")
     if note:
-        lines.extend(["", note])
+        lines.extend(["", f"*{note}*"])
     return "\n".join(lines)
 
 
@@ -95,7 +205,7 @@ def _comparison_md(event: dict[str, Any]) -> str:
     lines = [
         "### Same event, three ways",
         "",
-        "HIGH needs a human/vehicle detection and a gunshot score inside the time window.",
+        "HIGH needs a human/vehicle detection **and** a gunshot score inside the time window.",
         "",
     ]
     for key, label in (
@@ -103,7 +213,7 @@ def _comparison_md(event: dict[str, Any]) -> str:
         ("audio_only", "Audio only"),
         ("fused", "Fused"),
     ):
-        lines.append(f"- **{label}:** {comparison.get(key, '—')} — {reasons.get(key, '')}")
+        lines.append(f"- **{label}:** `{comparison.get(key, '—')}` — {reasons.get(key, '')}")
     return "\n".join(lines)
 
 
@@ -143,9 +253,17 @@ def _showcase_catalog(pipeline: Pipeline) -> list[dict[str, Any]]:
     return []
 
 
+def _showcase_labels(catalog: list[dict[str, Any]]) -> list[str]:
+    labels: list[str] = []
+    for row in catalog:
+        label = row.get("label") or f"[{row.get('category', 'Sample')}] {row.get('title', row.get('id'))}"
+        labels.append(str(label))
+    return labels or ["(default human + gunshot)"]
+
+
 def _sample_paths(
     pipeline: Pipeline, showcase_id: str | None = None
-) -> tuple[str | None, str | None, str, str]:
+) -> tuple[str | None, str | None, str, str, str]:
     processed = pipeline.root / "data" / "processed"
     images = load_jsonl(processed / "images" / "manifest.jsonl")
     audio = load_jsonl(processed / "audio" / "manifest.jsonl")
@@ -158,7 +276,9 @@ def _sample_paths(
             (
                 row
                 for row in catalog
-                if row.get("title") == showcase_id or row.get("id") == showcase_id
+                if row.get("label") == showcase_id
+                or row.get("title") == showcase_id
+                or row.get("id") == showcase_id
             ),
             None,
         )
@@ -169,13 +289,16 @@ def _sample_paths(
         clip = by_audio.get(str(chosen.get("audio_id")))
         domain = str(chosen.get("domain") or (image or {}).get("domain") or "camera_trap_rgb")
         title = str(chosen.get("title") or chosen.get("id") or "sample pair")
+        blurb = str(chosen.get("blurb") or "")
+        expected = str(chosen.get("expected_level") or "")
+        category = str(chosen.get("category") or "Sample")
         if image and clip and clip.get("waveform"):
-            return (
-                str(image["image"]),
-                str(clip["waveform"]),
-                domain,
-                f"Loaded showcase: {title}. Run the event to score them.",
+            status = (
+                f"<div class='ge-status'><strong>{category}</strong> · {title}<br/>"
+                f"{blurb}<br/><span class='ge-muted'>Proxy expected level: {expected}. "
+                f"Domain: {domain}.</span></div>"
             )
+            return str(image["image"]), str(clip["waveform"]), domain, status, expected
     image = next(
         (
             row
@@ -190,30 +313,37 @@ def _sample_paths(
     image_path = str(image["image"]) if image else None
     audio_path = str(clip["waveform"]) if clip else None
     domain = str((image or {}).get("domain") or "camera_trap_rgb")
-    return (
-        image_path,
-        audio_path,
-        domain,
-        "Loaded a sample camera-trap frame and a sample gunshot clip. Run the event to score them.",
+    status = (
+        "<div class='ge-status'>Loaded a sample camera-trap frame and a sample gunshot clip. "
+        "Run the event to score them.</div>"
     )
+    return image_path, audio_path, domain, status, "—"
 
 
 def build_demo(pipeline: Pipeline) -> gr.Blocks:
     """Dashboard used by rangers reviewing one event at a time."""
 
-    showcase_titles = [str(row.get("title") or row.get("id")) for row in _showcase_catalog(pipeline)]
-    if not showcase_titles:
-        showcase_titles = ["(default human + gunshot)"]
+    catalog = _showcase_catalog(pipeline)
+    showcase_titles = _showcase_labels(catalog)
     reports_panel = reports_markdown(pipeline.root)
+    info = pipeline.model_info()
+    img_loaded = any(
+        bool((info.get("image") or {}).get(d, {}).get("loaded"))
+        for d in ("aerial_thermal", "camera_trap_rgb")
+    )
+    aud_loaded = bool((info.get("audio") or {}).get("loaded"))
+    weight_chip = "Weights loaded" if (img_loaded or aud_loaded) else "Demo mode · no checkpoints"
 
     def on_sample(showcase_choice: str) -> tuple[Any, Any, str, str]:
-        image_path, audio_path, domain, message = _sample_paths(pipeline, showcase_choice)
+        image_path, audio_path, domain, message, _expected = _sample_paths(
+            pipeline, showcase_choice
+        )
         if not image_path or not audio_path:
             return (
                 None,
                 None,
                 "camera_trap_rgb",
-                "Sample files are not prepared. Run `make setup` first.",
+                "<div class='ge-card'>Sample files are not prepared. Run <code>make setup</code> first.</div>",
             )
         return image_path, audio_path, domain, message
 
@@ -228,8 +358,7 @@ def build_demo(pipeline: Pipeline) -> gr.Blocks:
         audio_path = _filepath(audio)
         if not visual_path and not audio_path:
             empty = (
-                "<div class='ge-card'>Add an image, a video, or a clip. "
-                "Empty submissions are not logged.</div>"
+                "<div class='ge-card'>Add an image or a clip. Empty submissions are not logged.</div>"
             )
             return (
                 None,
@@ -264,58 +393,108 @@ def build_demo(pipeline: Pipeline) -> gr.Blocks:
             result.annotated,
             result.spectrogram,
             _risk_html(event),
-            _evidence_md("Image", event["image_evidence"]),
-            _evidence_md("Audio", event["audio_evidence"]),
+            _evidence_md("Image evidence", event["image_evidence"]),
+            _evidence_md("Audio evidence", event["audio_evidence"]),
             _comparison_md(event),
             _history_rows(pipeline),
         )
 
-    # Default Gradio theme + our CSS. Soft/stone made the page look foreign and heavier.
-    with gr.Blocks(title="GuardianEye", css=CSS, analytics_enabled=False) as demo:
+    theme = gr.themes.Default(
+        primary_hue=gr.themes.Color(
+            c50="#eef7f1",
+            c100="#d7ecdf",
+            c200="#b5d9c4",
+            c300="#88bf9f",
+            c400="#5ea47c",
+            c500="#3d8f68",
+            c600="#2f6b4f",
+            c700="#1a3d2e",
+            c800="#143226",
+            c900="#102018",
+            c950="#0a140f",
+        ),
+        secondary_hue="stone",
+        neutral_hue="stone",
+        font=gr.themes.GoogleFont("DM Sans"),
+        font_mono=gr.themes.GoogleFont("IBM Plex Mono"),
+    ).set(
+        body_background_fill="#f3efe6",
+        block_background_fill="#fffcf7",
+        block_border_color="#d7d0c3",
+        block_label_text_color="#1a3d2e",
+        button_primary_background_fill="#2f6b4f",
+        button_primary_background_fill_hover="#3d8f68",
+        button_primary_text_color="#ffffff",
+    )
+
+    with gr.Blocks(title="GuardianEye", css=CSS, theme=theme, analytics_enabled=False) as demo:
         gr.HTML(
-            "<div class='ge-banner'>Proof-of-concept. Indicators, not confirmed poaching.</div>"
-        )
-        gr.Markdown(
+            f"""
+<div class="ge-hero">
+  <div class="ge-brand">GuardianEye</div>
+  <p class="ge-tagline">
+    Multimodal review for wildlife evidence. Vision and audio stay separate until late fusion.
+    A human, vehicle, or gunshot-like score is an <strong>indicator</strong> — not confirmed poaching.
+  </p>
+  <div class="ge-chip-row">
+    <span class="ge-chip"><strong>MAI</strong> Group 27</span>
+    <span class="ge-chip">Late fusion</span>
+    <span class="ge-chip">Belize ↔ Vietnam audio</span>
+    <span class="ge-chip">{weight_chip}</span>
+  </div>
+</div>
+<div class="ge-banner">Proof-of-concept. Indicators, not confirmed poaching. Synthetic proxy pairs are labelled as such.</div>
             """
-# GuardianEye
-
-Camera-trap and aerial-thermal frames go through the image branch. Short audio goes through a separate branch. The two meet only at the decision.
-
-A human, a vehicle, or a gunshot-like sound is an **indicator**, not proof of poaching.
-            """
         )
-        status = gr.Markdown("Upload a frame or a clip, or load a showcase sample.")
+
         with gr.Row():
-            visual = gr.Image(label="Image", type="filepath", height=220)
-            audio = gr.Audio(label="Audio clip", type="filepath")
+            with gr.Column(scale=5):
+                gr.HTML("<div class='ge-section-title'>1 · Choose a showcase scenario</div>")
+                showcase = gr.Dropdown(
+                    label="Sample library",
+                    choices=showcase_titles,
+                    value=showcase_titles[0],
+                    info="RGB day/night, aerial thermal, gunshot variants, rain/thunder/insects/wind distractors.",
+                )
+                with gr.Row():
+                    sample_btn = gr.Button("Load sample", variant="secondary")
+                    run_btn = gr.Button("Score event", variant="primary")
+                status = gr.HTML(
+                    "<div class='ge-status'>Pick a showcase sample, then score the event.</div>"
+                )
+                with gr.Row():
+                    visual = gr.Image(label="Image input", type="filepath", height=240)
+                    audio = gr.Audio(label="Audio input", type="filepath")
+                with gr.Row():
+                    domain = gr.Dropdown(
+                        label="Image domain",
+                        choices=["camera_trap_rgb", "aerial_thermal"],
+                        value="camera_trap_rgb",
+                    )
+                    profile = gr.Dropdown(
+                        label="Weight profile",
+                        choices=["balanced", "night", "wind"],
+                        value="balanced",
+                        info="Night favours audio. Wind favours vision.",
+                    )
+                    mode = gr.Dropdown(
+                        label="Decision mode",
+                        choices=["rules", "weighted"],
+                        value="rules",
+                    )
+            with gr.Column(scale=4):
+                gr.HTML("<div class='ge-section-title'>2 · Fusion decision</div>")
+                risk = gr.HTML("<div class='ge-card'>No event scored yet.</div>")
+                comparison = gr.Markdown("")
+                with gr.Row():
+                    image_md = gr.Markdown("")
+                    audio_md = gr.Markdown("")
+
+        gr.HTML("<div class='ge-section-title'>3 · Visual outputs</div>")
         with gr.Row():
-            domain = gr.Dropdown(
-                label="Image domain",
-                choices=["camera_trap_rgb", "aerial_thermal"],
-                value="camera_trap_rgb",
-            )
-            profile = gr.Dropdown(
-                label="Weight profile",
-                choices=["balanced", "night", "wind"],
-                value="balanced",
-            )
-            mode = gr.Dropdown(label="Decision mode", choices=["rules", "weighted"], value="rules")
-        showcase = gr.Dropdown(
-            label="Showcase sample",
-            choices=showcase_titles,
-            value=showcase_titles[0],
-        )
-        with gr.Row():
-            sample_btn = gr.Button("Load sample pair")
-            run_btn = gr.Button("Score event", variant="primary")
-        with gr.Row():
-            annotated = gr.Image(label="Annotated frame", type="pil", height=200)
-            spectrogram = gr.Image(label="Log-mel spectrogram", type="pil", height=200)
-        risk = gr.HTML("<div class='ge-card'>No event yet.</div>")
-        with gr.Row():
-            image_md = gr.Markdown("")
-            audio_md = gr.Markdown("")
-        comparison = gr.Markdown("")
+            annotated = gr.Image(label="Annotated frame", type="pil", height=220)
+            spectrogram = gr.Image(label="Log-mel spectrogram", type="pil", height=220)
+
         with gr.Accordion("Event log", open=False):
             history = gr.Dataframe(
                 headers=["timestamp", "risk", "alerted", "modalities", "reason", "event id"],
@@ -326,16 +505,20 @@ A human, a vehicle, or a gunshot-like sound is an **indicator**, not proof of po
             refresh = gr.Button("Refresh log")
         with gr.Accordion("Evaluation files", open=False):
             gr.Markdown(reports_panel)
+
         gr.Markdown(
-            "<span class='ge-muted'>Group 27 · Multimodal AI. Empty frames and background audio stay "
-            "in training. Paired-event numbers use a synthetic proxy protocol. "
-            "On Render, the first open after idle can take about a minute (cold start).</span>"
+            "<p class='ge-muted'>Empty frames and background audio stay in training. "
+            "Image metrics stay split by domain; audio stays site-stratified. "
+            "Paired demos use the synthetic proxy protocol.</p>"
         )
+
         sample_btn.click(on_sample, inputs=[showcase], outputs=[visual, audio, domain, status])
+        showcase.change(on_sample, inputs=[showcase], outputs=[visual, audio, domain, status])
         run_btn.click(
             on_run,
             inputs=[visual, audio, domain, profile, mode],
             outputs=[annotated, spectrogram, risk, image_md, audio_md, comparison, history],
         )
         refresh.click(lambda: _history_rows(pipeline), outputs=[history])
+        demo.load(on_sample, inputs=[showcase], outputs=[visual, audio, domain, status])
     return demo
